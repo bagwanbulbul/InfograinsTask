@@ -22,7 +22,10 @@ const Users = new schema({
     },
 	status:{
 		type:Boolean,
-	}
+	},
+    role:{
+        type: Number
+    }    
     
 }, { strict: false });
 var detail = mongoose.model("Users", Users)
