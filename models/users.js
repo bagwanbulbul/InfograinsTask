@@ -1,7 +1,3 @@
-// var mongoose = require('mongoose');
-// var Schema = mongoose.Schema;
-
-
 
 const mongoose = require("mongoose")
 const schema = mongoose.Schema
@@ -22,9 +18,11 @@ const Users = new schema({
     },
 	status:{
 		type:Boolean,
+        default:false
 	},
     role:{
-        type: Number
+        type: Number,
+        default:0
     }    
     
 }, { strict: false });

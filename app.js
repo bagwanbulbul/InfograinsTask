@@ -21,6 +21,7 @@
 
 const jwt = require('jsonwebtoken');
 const users = require("./routes/index");
+const admin = require("./routes/admin");
 const express = require('express');
 const app = express();
 
@@ -30,7 +31,6 @@ app.use(bodyParser.json())
 
 const  mongoose = require('mongoose')
 
-// mongoose.set('useFindAndModify', false);
 mongoose
   .connect('mongodb://localhost:27017/infograin?readPreference=primary&appname=MongoDB%20Compass&ssl=false', {
     useUnifiedTopology: true,
@@ -39,11 +39,12 @@ mongoose
   .then(() => {
     console.log('Connected to the Database successfully');
   }).catch((err)=>{
-    console.log(err)
+    console.log(err);
   })
 
-app.use('/', users)
+app.use('/', users);
+app.use('/admin',admin);
 
 app.listen(5000, ()=>{
-    console.log("server is listning on port 5000")
+    console.log("server is listning on port 5000");
 });

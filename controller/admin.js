@@ -11,42 +11,42 @@ async function validatePassword(plainPassword, hashedPassword) {
     return await bcrypt.compare(plainPassword, hashedPassword);
 }
 
-exports.signup = async (req, res) => {
+exports.adminSignup = async (req, res) => {
     try {
         const {
             name,
             email,
             password,
-            
         } = req.body
         const hashedPassword = await hashPassword(password);
+        console.log(password)
         const newUser = new User({
             name: name,
             email: email,
-            password: hashedPassword          
+            password: hashedPassword, 
+            status:true,
+            role:1          
         });
 
-        var userData = await User.find({email:req.body.email})
-        console.log(userData)
-        if(userData.length >0){
+        var adminData = await User.find({email:req.body.email})
+        if(adminData.length >0){
             return res.json({statusCode: 400, message: "Email alerady exist"})
         }
-
         let response = new User(newUser)
         response.save()
         .then((result)=>{
-            res.json({statusCode:"200",statusMsj:"Successfuly Register", data:result})
+           return res.json({statusCode:"200",statusMsj:"Successfuly Register", data:result})
         }).catch((err)=>{
-            console.log(err);
-            return res.send(err);
+            console.log(err)
+           return res.send(err)
         })
     } catch (error) {
-        console.log(error);
-        return res.send(error);
+        console.log(error)
+        return res.send(error)
     }
 }
 
-exports.login = async (req, res, next) => {
+exports.adminlogin = async (req, res, next) => {
     try {
         const {
             email,
@@ -67,31 +67,41 @@ exports.login = async (req, res, next) => {
             accessToken
         })
         console.log(accessToken)
-        return res.json({message:"login sucessful", accessToken:accessToken})
+        return res.json({statusCode:200,message:"login sucessful", accessToken:accessToken})
     } catch (error) {
         console.log(error);
         return res.json({statusCode:403,message:"login failed"})
     }
 }
 
-exports.view_profile =(req,res)=>{
-    const user_id = req.query.user_id
-    User.find({_id:user_id}).then(result=>{
-        return res.json({statusCode:200, data:result})
+exports.user_list= (req,res)=>{
+    // var user_id= req.params.user_id
+    User.find().then(result=>{
+       return res.send(result)
     }).catch(err=>{
        return res.send(err)
     })
 }
 
-exports.edit_profile =(req,res)=>{
+exports.user_details= (req,res)=>{
+    var user_id = req.query.user_id
+    User.find({_id:user_id}).then(result=>{
+        return res.json({message:"user details",data:result})
+    }).catch(err=>{
+        return res.send(err)
+    })
+}
+
+exports.admin_edit_profile =(req,res)=>{
     const {
         name,
         password,
         email,
         user_id,
+        status
     }=req.body;
     User.updateOne({_id:user_id},
-    {$set:{name:name, password: password, email:email}})
+    {$set:{name:name, password: password, email:email, status:status}})
     .then(result =>{
        return res.json({statusCode:"200",statusMsj:"Successfuly Update", data:result})
     }).catch(err =>{
@@ -99,6 +109,29 @@ exports.edit_profile =(req,res)=>{
     })
 }
 
+exports.delete_user = (req,res)=>{
+    const {
+        user_id
+    }= req.query;
+    User.deleteOne({_id:user_id})
+    .then(result =>{
+       return res.json({statusCode:"200",message:"delete successfuly"})
+    }).catch(err=>{
+       return res.send(err)
+    })
+    
+}
 
-
+exports.status_manage = (req,res)=>{
+    var user_id = req.body.user_id;
+    var status = req.body.status;
+    
+    User.updateOne({_id:user_id},
+        {$set:{status:status}})
+        .then(result =>{
+            return res.json({statusCode:"200",statusMsj:"Successfuly Update", data:result})
+        }).catch(err =>{
+            return res.send(err)
+        })
+}
 
